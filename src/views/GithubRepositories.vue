@@ -1,16 +1,25 @@
 <template>
     <div class=" container mx-auto mx-8 ">
-      <ul class="grid grid-cols-2 md:grid-cols-4 gap-6 ">
+      <ul class="grid grid-cols-2 md:grid-cols-5 gap-6 ">
 
-        <li v-for="repo in displayedRepositories" :key="repo.id" class="repo list-none p-4 bg-white rounded-3 overflow-hidden">
-        <li class="columns-md columns-lg columns-xl p-3 ">
+        <li v-for="repo in displayedRepositories" :key="repo.id" class="repo list-none p-4 bg-white rounded overflow-hidden">
+        <li class="columns-md columns-lg columns-xl p-3 align-center ">
            <router-link class="text-[1.5rem] capitalize text-gray-600 font-bold " :to="{ name: 'repository', params: { name: repo.name } }"><h3>{{ repo.name }}</h3></router-link>
            <h4 class="text-[1rem] font-semibold font-mono text-green-400 ">
           {{ repo.owner.login }}
 
         </h4>
           <p class=" repo-description text-[#737373] text-sm font-semibold grow pt-3 ">{{ repo.description }}</p>
-          <p class="pt-3 fs-4 fw-bold ">{{ repo.language }}</p>
+          <!-- <p class="pt-3 fs-4 fw-bold ">{{ repo.language }}</p> -->
+
+           <div class="repository-language" :style="{ color: getLanguageColor(repo.language) }">
+            <span class="fs-4 fw-bold me-1">
+        <i class="bi" :class="getLanguageIcon(repo.language)"></i>
+            </span>
+        {{ repo.language }}
+      </div>
+
+       <div class="repository-updated">{{ formatDate(repo.updated_at) }}</div>
         </li>
       </li>
       </ul>
@@ -33,6 +42,7 @@
   </template>
 
   <script>
+  import languages from './languages.js'
   export default {
     name: 'GithubRepositories',
     data() {
@@ -48,6 +58,7 @@
         const endIndex = startIndex + this.itemsPerPage;
         return this.repositories.slice(startIndex, endIndex);
       },
+
       totalPages() {
         return Math.ceil(this.repositories.length / this.itemsPerPage);
       },
@@ -66,7 +77,6 @@
       fetchRepositories() {
         const username = 'iruojefaith';
         const url = `https://api.github.com/users/${username}/repos`;
-
         fetch(url)
           .then(response => response.json())
           .then(data => {
@@ -78,25 +88,33 @@
         if (pageNumber >= 1 && pageNumber <= this.totalPages) {
           this.currentPage = pageNumber;
         }
-      }
+      },
+      getLanguageColor(language) {
+      if (!language) return null
+      const lang = language
+      return languages[lang] ? languages[lang].color : null
+    },
+    getLanguageIcon(language) {
+      if (!language) return null
+      const lang = language
+      return languages[lang] ? languages[lang].icon : null
+    },
+    formatDate(dateString) {
+    }
     }
   };
   </script>
 
   <style>
-
   .fw-medium {
   font-weight: 500;
 }
-
 .fw-semibold {
   font-weight: 600;
 }
-
 .font-mono {
   font-family: "Roboto Mono", monospace;
 }
-
 .fs-7 {
   font-size: 0.8rem;
 }
@@ -119,7 +137,6 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
     .repo:hover {
       transform: scale(1.02);
     }
-
     .repo-description {
       position: relative;
       overflow: hidden;
@@ -133,5 +150,14 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
         bottom: 0;
         background: linear-gradient(to bottom, transparent, white);
       }
+      .repository-language {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  margin-top: 8px;
+}
 
+.repository-language i {
+  margin-right: 4px;
+}
   </style>
