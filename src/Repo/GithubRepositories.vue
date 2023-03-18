@@ -1,6 +1,6 @@
 <template>
-    <div class=" container mx-auto ">
-      <ul class="grid grid-cols-2 md:grid-cols-5 gap-6 ">
+    <div class=" container md:mx-auto px-3  mt-5 ">
+      <ul class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-6   ">
 
         <li v-for="repo in displayedRepositories" :key="repo.id" class="repo list-none p-4 bg-white rounded overflow-hidden">
         <li class=" p-3 align-center ">
@@ -18,7 +18,7 @@
         {{ repo.language }}
       </div>
 
-       <div class="repository-updated">{{ formatDate(repo.updated_at) }}</div>
+       <div class="repository-updated mt-9 text-gray-600 ">{{ new Date(repo.updated_at).toLocaleDateString('en-us',) }}</div>
         </li>
       </li>
       </ul>
