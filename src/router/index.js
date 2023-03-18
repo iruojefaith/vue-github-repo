@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../Repo/HomeView.vue'
 
 const routes = [
   {
@@ -10,17 +10,17 @@ const routes = [
   {
     path: '/repositories',
     name: 'repositories',
-    component: () => import('../views/GithubRepositories.vue')
+    component: () => import('../Repo/GithubRepositories.vue')
   },
   {
     path: '/repository/:name',
     name: 'repository',
-    component: () => import('../views/RepoDetails.vue')
+    component: () => import('../Repo/RepoDetails.vue')
   },
   {
     path: '/:catchAll(.*)',
     name: '404',
-    component: () => import('../views/ErrorPage.vue')
+    component: () => import('../Repo/ErrorPage.vue')
   },
 ]
 

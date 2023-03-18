@@ -1,16 +1,15 @@
 <template>
-    <div class=" container mx-auto mx-8 ">
+    <div class=" container mx-auto ">
       <ul class="grid grid-cols-2 md:grid-cols-5 gap-6 ">
 
         <li v-for="repo in displayedRepositories" :key="repo.id" class="repo list-none p-4 bg-white rounded overflow-hidden">
-        <li class="columns-md columns-lg columns-xl p-3 align-center ">
-           <router-link class="text-[1.5rem] capitalize text-gray-600 font-bold " :to="{ name: 'repository', params: { name: repo.name } }"><h3>{{ repo.name }}</h3></router-link>
-           <h4 class="text-[1rem] font-semibold font-mono text-green-400 ">
+        <li class=" p-3 align-center ">
+           <router-link class="text-[1.3rem] capitalize text-gray-600 font-bold " :to="{ name: 'repository', params: { name: repo.name } }"><h3 class="repo-name ">{{ repo.name }}</h3></router-link>
+           <h4 class="text-xs font-semibold font-mono text-green-400 ">
           {{ repo.owner.login }}
 
         </h4>
-          <p class=" repo-description text-[#737373] text-sm font-semibold grow pt-3 ">{{ repo.description }}</p>
-          <!-- <p class="pt-3 fs-4 fw-bold ">{{ repo.language }}</p> -->
+          <p class="repo-description text-[#737373] text-sm font-semibold grow pt-3">{{ repo.description ? repo.description.slice(0, 50) + '...' : 'No description' }}</p>
 
            <div class="repository-language" :style="{ color: getLanguageColor(repo.language) }">
             <span class="fs-4 fw-bold me-1">
@@ -54,10 +53,17 @@
     },
     computed: {
       displayedRepositories() {
-        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-        const endIndex = startIndex + this.itemsPerPage;
-        return this.repositories.slice(startIndex, endIndex);
-      },
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  const filteredRepositories = this.repositories
+    .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    .map(repo => ({
+      ...repo,
+      name: repo.name.replace(/[-_\s]/g, "")
+    }));
+  return filteredRepositories.slice(startIndex, endIndex);
+},
+
 
       totalPages() {
         return Math.ceil(this.repositories.length / this.itemsPerPage);
@@ -76,13 +82,14 @@
     methods: {
       fetchRepositories() {
         const username = 'iruojefaith';
-        const url = `https://api.github.com/users/${username}/repos`;
-        fetch(url)
-          .then(response => response.json())
-          .then(data => {
-            this.repositories = data;
-          })
-          .catch(error => console.error(error));
+      const url = `https://api.github.com/users/${username}/repos`;
+      fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      // Sort by updated_at in descending order
+      this.repositories = data.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+    })
+    .catch(error => console.error(error));
       },
       goToPage(pageNumber) {
         if (pageNumber >= 1 && pageNumber <= this.totalPages) {
@@ -127,9 +134,15 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
   font-weight: 500;
   line-height: 1.2;
 }
+.repo-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 15ch;
+}
  .repo {
     position: relative;
-    height: 18rem;
+    height: 16rem;
     transition: 120ms ease;
     cursor: pointer;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
